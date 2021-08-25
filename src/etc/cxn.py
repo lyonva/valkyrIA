@@ -27,24 +27,24 @@ class cxn:
         return new_r/div, new_i/div
     
     # Unary operations
-    def __neg__(self, other):
+    def __neg__(self):
         return cxn(-self.r, -self.i)
     
-    def __pos__(self, other):
+    def __pos__(self):
         return cxn(self.r, self.i)
     
     # Binary operations
     def __add__(self, other):
-        return cxn(self.cxn_sum(other))
+        return cxn(*self.cxn_sum(other))
     
     def __sub__(self, other):
-        return cxn(self.cxn_sub(other))
+        return cxn(*self.cxn_sub(other))
     
     def __mul__(self, other):
-        return cxn(self.cxn_mul(other))
+        return cxn(*self.cxn_mul(other))
     
     def __truediv__(self, other):
-        return cxn(self.cxn_div(other))
+        return cxn(*self.cxn_div(other))
     
     # Binary assignments
     def __iadd__(self, other):
