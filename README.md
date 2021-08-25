@@ -4,4 +4,4 @@
 In norse mythologies, valkyries decided who lived and who died in battle. Hopefully this AI will just end the battle.
 
 ## Documentation
-Please see the [documentation html file](https://github.com/lyonva/valkyrIA/).
+Please see the [documentation html file](https://github.com/lyonva/valkyrIA/blob/main/doc/index.html).
