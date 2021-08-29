@@ -6,12 +6,24 @@ import pytest
 from random import randint
 from src.io import CSV
 from src.etc import atom
+import time
+
 
 import pandas as pd
 
+def load_and_time(path):
+    start_time = time.time()
+    data = CSV.read_file(path)
+    end_time = time.time()
+    duration = end_time - start_time
+    
+    print("Load duration for %s dataset: %.6f ms" % (path, duration*1000))
+    return data
+
 def test_read_weather():
     path = os.path.join("data", "weather.csv")
-    data = CSV.read_file(path)
+    
+    data = load_and_time(path)
     
     # Check size
     assert len(data) == 15
@@ -30,7 +42,7 @@ def test_read_weather():
 
 def test_read_auto93():
     path = os.path.join("data", "auto93.csv")
-    data = CSV.read_file(path)
+    data = load_and_time(path)
     
     true_data = pd.read_csv(path, na_values = "?")
     
@@ -58,7 +70,7 @@ def test_read_auto93():
 
 def test_read_pom3a():
     path = os.path.join("data", "pom3a.csv")
-    data = CSV.read_file(path)
+    data = load_and_time(path)
     
     true_data = pd.read_csv(path)
     header = true_data.columns
