@@ -19,8 +19,10 @@ class CSV(Reader):
             matrix = []
             row_length = 0
             previous = []
+            i = 0
             
             while line := file.readline():
+                i += 1
                 
                 # Remove blanks, remove comments, and split by comma
                 row = line.strip().split("#")[0].split(",")
@@ -49,6 +51,8 @@ class CSV(Reader):
                     if row_length == len(row):
                         # Only add if the length matches
                         matrix.append(row)
+                    else:
+                        print("File %s: error on row %d. Bad shape." % (path, i))
                     previous = []
                 
             return matrix
