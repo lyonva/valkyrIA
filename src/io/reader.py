@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from src.etc import atom
 
 # Abstract class reader
 # Analyzes input of a particular format
@@ -15,6 +16,10 @@ class CSV(Reader):
     
     @staticmethod
     def read_file(path):
+        return CSV.parse_file( CSV.read_file_raw(path), path )
+    
+    @staticmethod
+    def read_file_raw(path):
         with open(path, 'r',  encoding='utf-8') as file:
             matrix = []
             row_length = 0
@@ -56,6 +61,28 @@ class CSV(Reader):
                     previous = []
                 
             return matrix
+        
+    # Check headers and determine if data is compliant
+    @staticmethod
+    def parse_file(matrix, path = ""):
+        n_col = len(matrix[0])
+        for j in range(n_col):
+            col_name = matrix[0][j]
+            
+            if "?" in col_name:
+                continue
+            if col_name[0] == col_name[0].lower():
+                continue # Keep as text
+            
+            # Now convert data to numerical type
+            # and check each row
+            for i, row in enumerate(matrix[1:]):
+                row[j] = atom(row[j])
+                if type(row[j]) not in [bool,int,float]:
+                    # Not of the type we wanted, delete
+                    matrix.remove(row)
+                    print("File %s: error on column %s. Incorrect type on row %d." % (path, col_name, i))
+        return matrix
 
 
 if __name__ == "__main__":
@@ -72,7 +99,7 @@ if __name__ == "__main__":
     tf.write(
         "\n".join([
             ','.join(
-                [''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+                [''.join(random.choices(string.ascii_lowercase, k=10))
                      for i in range(5)]
                 )
             for i in range(6)])
