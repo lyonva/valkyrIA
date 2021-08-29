@@ -3,11 +3,11 @@ import sys, os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
 import pytest
-from random import randint
+from random import randint, random, choices
 from src.io import CSV
 from src.etc import atom
 import time
-
+import string
 
 import pandas as pd
 
@@ -90,3 +90,49 @@ def test_read_pom3a():
     for i in range(true_data.shape[0]):
         for j in range(true_data.shape[1]):
             assert data[i+1][j] == true_data[i][j]
+
+# Adds noise rows to the pom3a test
+def test_read_pom3a_noise():
+    path = os.path.join("data", "pom3a.csv")
+    
+    true_data = pd.read_csv(path)
+    header = true_data.columns
+    true_data = true_data.to_numpy()
+    
+    # Generate a new noisy file
+    with open(path, 'r',  encoding='utf-8') as in_file:
+        with open("temp-pom3a.csv", 'w',  encoding='utf-8') as out_file:
+            while row := in_file.readline():
+                out_file.writelines([row])
+                
+                # Insert noise at a 5% chance
+                if random() < 0.05:
+                    # 50% of having right size
+                    if random() < 0.5:
+                        size = true_data.shape[1]
+                    else:
+                        while (size := randint(0, true_data.shape[1]*2)) == true_data.shape[1]: pass
+                    row = ','.join(
+                        [''.join(choices(string.ascii_lowercase + string.ascii_uppercase + string.ascii_letters, k=randint(1, 30)))
+                             for i in range(size)]
+                        )
+                    out_file.writelines([row + "\n"])
+    
+    data = load_and_time("temp-pom3a.csv")
+    
+    # Last row of pom3a is missing one value, remove
+    true_data = true_data[:-1]
+    
+    # Check size
+    assert len(data) == true_data.shape[0] + 1
+    for row in data:
+        assert len(row) == true_data.shape[1]
+    
+    # Check data
+    for j in range(true_data.shape[1]):
+        assert data[0][j] == header[j]
+    for i in range(true_data.shape[0]):
+        for j in range(true_data.shape[1]):
+            assert data[i+1][j] == true_data[i][j]
+    
+    os.remove("temp-pom3a.csv")
