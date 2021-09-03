@@ -1,5 +1,3 @@
-from .reader import Reader
-from .reader import CSV
+from .reader import read_csv
 
-__all__ = ["Reader",
-           "CSV"]
+__all__ = ["read_csv"]

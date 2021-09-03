@@ -4,7 +4,7 @@ sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
 import pytest
 from random import randint, random, choices
-from src.io import CSV
+from src.io import read_csv
 from src.etc import atom
 import time
 import string
@@ -13,7 +13,7 @@ import pandas as pd
 
 def load_and_time(path):
     start_time = time.time()
-    data = CSV.read_file(path)
+    data = read_csv(path)
     end_time = time.time()
     duration = end_time - start_time
     
