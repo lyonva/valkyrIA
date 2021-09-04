@@ -87,6 +87,6 @@ class Some(Column):
         # If it is full, choose anything to replace
         else:
             if random() < self.cap / self.n:
-                pos = int(random() * self.cap())
+                pos = int(random() * self.cap)
                 self.samples[pos] = x
                 self.sorted = False
