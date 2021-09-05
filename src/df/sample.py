@@ -31,10 +31,13 @@ class Sample:
         self.names = []
         self.rows = []
         self.keep = True
+        self.n_rows = 0
     
     @staticmethod
     def read_csv(path):
-        return Sample().read( read_csv(path) )
+        df = Sample()
+        df.read( read_csv(path) )
+        return df
 
     def _make_header(self, names):
         self.names = names
@@ -63,6 +66,7 @@ class Sample:
                 col.add(item)
             if self.keep:
                 self.rows.append(row)
+                self.n_rows += 1
 
     def add(self, row):
         if len(self.names) == 0:
