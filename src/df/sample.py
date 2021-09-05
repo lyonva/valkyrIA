@@ -41,15 +41,15 @@ class Sample:
 
     def _make_header(self, names):
         self.names = names
-        for name in names:
+        for i, name in enumerate(names):
             # Generate new column
             new_type = col_type(name)
             if new_type in [SKIP_TYPE]:
-                col = Skip(name)
+                col = Skip(i, name)
             elif new_type in [NUM_TYPE, GOAL_TYPE]:
-                col = Num(name)
+                col = Num(i, name)
             elif new_type in [SYM_TYPE, KLASS_TYPE]:
-                col = Sym(name)
+                col = Sym(i, name)
             
             # Append in cols and in x or y
             self.cols.append(col)

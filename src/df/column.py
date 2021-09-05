@@ -5,7 +5,8 @@ from random import random
 # Base class for data columns
 class Column(ABC):
 
-    def __init__(self, name):
+    def __init__(self, at, name):
+        self.at = at
         self.name = name
         self.n = 0
 
@@ -22,8 +23,8 @@ class Skip(Column):
 # Number column class
 # Stores numerical values
 class Num(Column):
-    def __init__(self, name):
-        super(Num, self).__init__(name)
+    def __init__(self, at, name):
+        super(Num, self).__init__(at, name)
         self.lo = inf
         self.hi = -inf
         self.mu = 0
@@ -47,8 +48,8 @@ class Num(Column):
 # Symbol column class
 # Stores categorical values
 class Sym(Column):
-    def __init__(self, name):
-        super(Sym, self).__init__(name)
+    def __init__(self, at, name):
+        super(Sym, self).__init__(at, name)
         self.count = {}
         self.mode = []
         self.n_mode = 0
@@ -71,8 +72,8 @@ class Sym(Column):
 # Sample column class
 # Stores a random subset of the added values
 class Some(Column):
-    def __init__(self, name):
-        super(Some, self).__init__(name)
+    def __init__(self, at, name):
+        super(Some, self).__init__(at, name)
         self.samples = []
         self.cap = 256
         self.sorted = False

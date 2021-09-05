@@ -12,7 +12,7 @@ def test_columns_skip():
     # Generate 100000 random numbers between +-100
     data = [randint(-100,100) for i in range(100000)]
 
-    col = Skip("test")
+    col = Skip(0, "test")
     for d in data:
         col.add(d)
     
@@ -23,7 +23,7 @@ def test_columns_num():
     # Generate 100000 random numbers between +-100
     data = [randint(-100,100) for i in range(100000)]
 
-    col = Num("test")
+    col = Num(0, "test")
     for d in data:
         col.add(d)
     
@@ -42,7 +42,7 @@ def test_columns_sym_unbalanced():
 
     data = choices(words, p, k = 100000)
 
-    col = Sym("test")
+    col = Sym(0, "test")
     for d in data:
         col.add(d)
     
@@ -66,7 +66,7 @@ def test_columns_sym_balanced():
 
     data = choices(words, p, k = 100000)
 
-    col = Sym("test")
+    col = Sym(0, "test")
     for d in data:
         col.add(d)
     
@@ -89,7 +89,7 @@ def test_columns_sym_even():
 
     data = words * 25000
 
-    col = Sym("test")
+    col = Sym(0, "test")
     for d in data:
         col.add(d)
     
@@ -105,7 +105,7 @@ def test_columns_some():
     # Generate 100000 random numbers between +-100
     data = [randint(-100,100) for i in range(100000)]
 
-    col = Some("test")
+    col = Some(0, "test")
     for d in data:
         col.add(d)
     
