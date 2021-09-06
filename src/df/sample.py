@@ -1,6 +1,8 @@
 from src.df import Skip, Num, Sym, Some
 import string
 from src.io import read_csv
+from math import exp
+from functools import cmp_to_key
 
 SKIP_TYPE = 0
 NUM_TYPE = 1
@@ -82,3 +84,62 @@ class Sample:
         new_sample = Sample()
         new_sample.add(self.names)
         return new_sample
+    
+    def sort(self, asc=True):
+        fun = lambda r1, r2: self._zitler(r1, r2)
+        self.rows.sort(key = cmp_to_key(fun), reverse = not(asc))
+    
+    # Multi-objective order function for rows
+    # Equivalent of askink r1 < r2
+    def _zitler(self, r1, r2):
+        goals = self.y
+        s1, s2 = 0, 0
+        n = len(goals)
+        for goal in goals:
+            w = goal.weight() # Ask if min or max column
+
+            # Get normalized values for each row
+            x = goal.norm_score(r1[goal.at])
+            y = goal.norm_score(r2[goal.at])
+
+            # Scores
+            s1 -= exp( w * (x-y)/n )
+            s2 -= exp( w * (y-x)/n )
+        
+        # Return in format of python sort
+        if s1/n < s2/n:
+            return -1
+        elif s1/n > s2/n:
+            return 1
+        else:
+            return 0
+
+    # Convert to string
+    # Show header, first 5 and last 5 rows
+    def __str__(self):
+        space = [len(n) + 5 for n in self.names]
+        s = ""
+
+        # Header
+        for n, sp in zip(self.names, space):
+            s += f"{n : <{sp}}"
+        s += "\n"
+
+        # First 5
+        rows = self.rows[0:5]
+        for row in rows:
+            for r, sp in zip(row, space):
+                s += f"{r : <{sp}}"
+            s += "\n"
+        
+        # Padding
+        s+= "\n"
+
+        # Last 5
+        rows = self.rows[::-1][0:5][::-1]
+        for row in rows:
+            for r, sp in zip(row, space):
+                s += f"{r : <{sp}}"
+            s += "\n"
+
+        return s

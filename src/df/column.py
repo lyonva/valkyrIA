@@ -44,6 +44,16 @@ class Num(Column):
         self.mu2 += delta * (x - self.mu)
         if self.n > 1:
             self.sd = sqrt((self.mu2 / (self.n - 1)))
+    
+    def weight(self):
+        if self.name[-1] == "+":
+            return 1
+        if self.name[-1] == "-":
+            return -1
+        return 0
+    
+    def norm_score(self, x):
+        return (x - self.lo) / (self.hi - self.lo)
 
 # Symbol column class
 # Stores categorical values
