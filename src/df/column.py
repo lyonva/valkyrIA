@@ -126,3 +126,6 @@ class Some(Column):
                 pos = int(random() * self.cap)
                 self.samples[pos] = x
                 self.sorted = False
+    
+    def distance(self, x1, x2):
+        return 1
