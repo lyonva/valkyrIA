@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from math import inf, sqrt
 from random import random
 
+def is_na(x):
+    return x == "?"
+
 # Base class for data columns
 class Column(ABC):
 
@@ -14,11 +17,18 @@ class Column(ABC):
     def add(self, x):
         pass
 
+    @abstractmethod
+    def distance(self, x1, x2):
+        pass
+
 # Skip column class
 # Ignores data
 class Skip(Column):
     def add(self, x):
         pass
+    
+    def distance(self, x1, x2):
+        return 1
 
 # Number column class
 # Stores numerical values
@@ -54,6 +64,16 @@ class Num(Column):
     
     def norm_score(self, x):
         return (x - self.lo) / (self.hi - self.lo)
+    
+    def distance(self, x1, x2):
+        if is_na(x1) and is_na(x2):
+            return 1
+        if is_na(x1) or is_na(x2):
+            x = x1 if is_na(x2) else x2
+            x = self.norm_score(x)
+            y = 0 if x > 0.5 else 1
+            return y - x
+        return self.norm_score(x1) - self.norm_score(x2)
 
 # Symbol column class
 # Stores categorical values
@@ -78,6 +98,11 @@ class Sym(Column):
             self.mode = [x]
         elif self.count[x] == self.n_mode:
             self.mode.append(x)
+    
+    def distance(self, x1, x2):
+        if is_na(x1) or is_na(x2):
+            return 1
+        return 0 if x1.upper() == x2.upper() else 1
 
 # Sample column class
 # Stores a random subset of the added values
