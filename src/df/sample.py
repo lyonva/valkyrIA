@@ -1,9 +1,11 @@
 from src.df import Skip, Num, Sym, Some
+from src.etc import argsort, sortarg
 import string
 from src.io import read_csv
-from math import exp
+from math import exp, ceil
 from functools import cmp_to_key
 import sys
+from random import sample
 
 SKIP_TYPE = 0
 NUM_TYPE = 1
@@ -117,7 +119,78 @@ class Sample:
 
         a.sort(key = cmp_to_key(sort_fun), reverse = False)
         return a
+    
+    def shuffle(self, rows = None, samples = None):
+        rows = self.rows if rows is None else rows
+        samples = self.n_rows if samples is None else samples
+        samples = min(len(rows), samples)
+        idx = sample( [i for i in range(len(rows))], k = samples )
+        return [ rows[i] for i in idx ]
+    
+    def faraway(self, row, rows = None, *, settings = {}):
+        rows = self.rows if rows is None else rows
+        samples = settings["samples"] if "samples" in settings else 128
+        all = self.neighbors(row, settings=settings, rows = self.shuffle( rows, samples = samples ))
+        return all[-1][1]
+    
+    # Get maximum distance of a sub-group
+    def disonance(self, rows = None):
+        rows = self.rows if rows is None else rows
+        n = len(rows)
+        zero = self.shuffle(rows, 1)[0]
+        one = self.faraway(zero, rows, settings={"samples":n})
+        two = self.faraway(one, rows, settings={"samples":n})
+        return self.distance(one, two)
 
+    # Get maximum distance of sub-group
+    # Normalized by distance of the all
+    def norm_disonance(self, rows):
+        return self.disonance(rows) / self.disonance(self.rows)
+
+    def div1(self, rows = None, cols = None, *, settings = {}):
+        rows = self.rows if rows is None else rows
+        cols = self.x if cols is None else cols
+
+        # Select random row, then the farthest away, and so on
+        zero = self.shuffle(rows, samples = 1)[0]
+        A = self.faraway(zero, rows, settings=settings)
+        B = self.faraway(A, rows, settings=settings)
+        c = self.distance(A, B, settings = settings) # Distance between A and B
+
+        projection = []
+        for C in rows:
+            a = self.distance(C, B, settings=settings) # D between B and C
+            b = self.distance(A, C, settings=settings) # D between A and C
+            
+            # Calculate this C's projection
+            # This is the "shadow" of C
+            # In the line that crosses A and B
+            # Assume A, B, and C form a triangle
+            # Calculate the angle of A as:
+            # cos(A) = (b^2 + c^2 - a^2) / (2bc)
+            # Then we find the shadow point D: C's projection in the A-B line
+            # We find the distance x between A and D as:
+            # x = cos(a) * b
+            # To simplify: x = (b^2 + c^2 - a^2) / (2c)
+            proj = (b**2 + c**2 - a**2) / (2*c)
+            projection.append(proj)
+        order = argsort(projection)
+        sorted = sortarg(rows, order)
+        mid = len(sorted) // 2
+        return sorted[:mid], sorted[mid:]
+    
+    def divs(self, *, settings = {}):
+        return self._divs( self.rows, ceil( self.n_rows**(1/2) ), settings=settings )
+    
+    def _divs(self, rows, min_leaf_size, *, settings = {}):
+        if len(rows) < 2*min_leaf_size:
+            return [rows]
+        left, right = self.div1(rows, settings = settings)
+        left = self._divs(left, min_leaf_size, settings=settings)
+        right = self._divs(right, min_leaf_size, settings=settings)
+        left.extend(right)
+        return left
+        
     
     # Multi-objective order function for rows
     # Equivalent of askink r1 < r2
