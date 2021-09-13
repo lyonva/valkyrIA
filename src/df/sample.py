@@ -3,7 +3,7 @@ import string
 from src.io import read_csv
 from math import exp
 from functools import cmp_to_key
-from sys.float_info import epsilon
+import sys
 
 SKIP_TYPE = 0
 NUM_TYPE = 1
@@ -92,23 +92,31 @@ class Sample:
     
     def distance(self, r1, r2, *, settings = {}):
         d = 0
-        n = epsilon
+        n = sys.float_info.epsilon
         p = settings["p"] if "p" in settings.keys() else 2
         cols = settings["cols"] if "cols" in settings.keys() else self.x
-        for col in self.x:
-            if type(self.x) in [Num, Sym]:
+        for col in cols:
+            if type(col) in [Num, Sym]:
                 n += 1
                 a = r1[col.at]
                 b = r2[col.at]
-                d += col.distance(a, b)^p
-        return (d/n)^(1/p)
+                d += col.distance(a, b)**p
+        return (d/n)**(1/p)
 
     def neighbors(self, r1, *, settings = {}, rows = None):
         a = []
         rows = rows if rows is not None else self.rows
         for r2 in rows:
-            a.append( (self.distance(r1, r2, settings=settings), r2) )
-        a.sort(lambda x, y : x[1] < y[1])
+            if r1 != r2:
+                a.append( (self.distance(r1, r2, settings=settings), r2) )
+        
+        def sort_fun(x, y):
+            if x[0] == y[0]: return 0
+            elif x[0] < y[0]: return -1
+            else: return 1
+
+        a.sort(key = cmp_to_key(sort_fun), reverse = False)
+        return a
 
     
     # Multi-objective order function for rows
