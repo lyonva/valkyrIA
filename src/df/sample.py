@@ -3,6 +3,7 @@ import string
 from src.io import read_csv
 from math import exp
 from functools import cmp_to_key
+from sys.float_info import epsilon
 
 SKIP_TYPE = 0
 NUM_TYPE = 1
@@ -88,6 +89,27 @@ class Sample:
     def sort(self, asc=True):
         fun = lambda r1, r2: self._zitler(r1, r2)
         self.rows.sort(key = cmp_to_key(fun), reverse = not(asc))
+    
+    def distance(self, r1, r2, *, settings = {}):
+        d = 0
+        n = epsilon
+        p = settings["p"] if "p" in settings.keys() else 2
+        cols = settings["cols"] if "cols" in settings.keys() else self.x
+        for col in self.x:
+            if type(self.x) in [Num, Sym]:
+                n += 1
+                a = r1[col.at]
+                b = r2[col.at]
+                d += col.distance(a, b)^p
+        return (d/n)^(1/p)
+
+    def neighbors(self, r1, *, settings = {}, rows = None):
+        a = []
+        rows = rows if rows is not None else self.rows
+        for r2 in rows:
+            a.append( (self.distance(r1, r2, settings=settings), r2) )
+        a.sort(lambda x, y : x[1] < y[1])
+
     
     # Multi-objective order function for rows
     # Equivalent of askink r1 < r2

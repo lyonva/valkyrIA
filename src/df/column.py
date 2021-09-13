@@ -18,7 +18,7 @@ class Column(ABC):
         pass
 
     @abstractmethod
-    def distance(self, x1, x2):
+    def distance(self, x1, x2, settings = {}):
         pass
 
 # Skip column class
@@ -27,7 +27,7 @@ class Skip(Column):
     def add(self, x):
         pass
     
-    def distance(self, x1, x2):
+    def distance(self, x1, x2, settings = {}):
         return 1
 
 # Number column class
@@ -65,7 +65,7 @@ class Num(Column):
     def norm_score(self, x):
         return (x - self.lo) / (self.hi - self.lo)
     
-    def distance(self, x1, x2):
+    def distance(self, x1, x2, settings = {}):
         if is_na(x1) and is_na(x2):
             return 1
         if is_na(x1) or is_na(x2):
@@ -99,7 +99,7 @@ class Sym(Column):
         elif self.count[x] == self.n_mode:
             self.mode.append(x)
     
-    def distance(self, x1, x2):
+    def distance(self, x1, x2, settings = {}):
         if is_na(x1) or is_na(x2):
             return 1
         return 0 if x1.upper() == x2.upper() else 1
@@ -127,5 +127,5 @@ class Some(Column):
                 self.samples[pos] = x
                 self.sorted = False
     
-    def distance(self, x1, x2):
+    def distance(self, x1, x2, settings = {}):
         return 1
