@@ -138,8 +138,8 @@ class Sample:
         rows = self.rows if rows is None else rows
         n = len(rows)
         zero = self.shuffle(rows, 1)[0]
-        one = self.faraway(zero, rows, settings={"samples":n})
-        two = self.faraway(one, rows, settings={"samples":n})
+        one = self.faraway(zero, rows)
+        two = self.faraway(one, rows)
         return self.distance(one, two)
 
     # Get maximum distance of sub-group
