@@ -11,7 +11,7 @@ def random_projection_dataset(file):
     df = Sample.read_csv(path)
 
     start_time = time.time()
-    projections = df.divs()
+    projections = df.divs(settings = {"verbose" : True})
     end_time = time.time()
     duration = end_time - start_time
 

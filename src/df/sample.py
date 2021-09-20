@@ -3,6 +3,7 @@ from src.etc import argsort, sortarg
 import string
 from src.io import read_csv
 from math import exp, ceil
+from statistics import median
 from functools import cmp_to_key
 import sys
 from random import sample
@@ -180,17 +181,49 @@ class Sample:
         return sorted[:mid], sorted[mid:]
     
     def divs(self, *, settings = {}):
-        return self._divs( self.rows, ceil( self.n_rows**(1/2) ), settings=settings )
+        return self._divs( self.rows, 1, ceil( self.n_rows**(1/2) ), settings=settings )
     
-    def _divs(self, rows, min_leaf_size, *, settings = {}):
+    def _divs(self, rows, level, min_leaf_size, *, settings = {}):
         if len(rows) < 2*min_leaf_size:
+            self._print_leaf(rows, level, settings=settings)
             return [rows]
+        self._print_node(rows, level, settings=settings)
         left, right = self.div1(rows, settings = settings)
-        left = self._divs(left, min_leaf_size, settings=settings)
-        right = self._divs(right, min_leaf_size, settings=settings)
+        left = self._divs(left, level + 1, min_leaf_size, settings=settings)
+        right = self._divs(right, level + 1, min_leaf_size, settings=settings)
         left.extend(right)
         return left
-        
+
+    # Show a non-leaf node of the random projection
+    def _print_node(self, rows, level, *, settings = {}):
+        if settings.get("verbose") == True:
+            text = "|.. " * level
+            text += f"n={len(rows)} c={self.disonance(rows) : .2f}"
+            print(text)
+    
+    # Show a leaf node of the random projection
+    def _print_leaf(self, rows, level, *, settings = {}):
+        if settings.get("verbose") == True:
+            text = "|.. " * level
+            text += f"n={len(rows)} c={self.disonance(rows) : .2f}"
+            text += " " * 5
+            text += "goals = ["
+            if self.klass is not None:
+                text += "-" # TODO
+            elif len(self.y) > 0:
+                data = [ self.sample_median(rows, c) for c in self.y ]
+                data = [ f"{d : .1f}" for d in data ]
+                text += ",".join(data)
+            else:
+                text += "-"
+            text += "]"
+            print(text)
+    
+    # Get the median of a sub-sample
+    # On a particular column
+    def sample_median(self, rows, col):
+        data = [ r[col.at] for r in rows ]
+        return median(data)
     
     # Multi-objective order function for rows
     # Equivalent of askink r1 < r2
