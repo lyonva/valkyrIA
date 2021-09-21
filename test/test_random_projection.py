@@ -27,12 +27,15 @@ def random_projection_dataset(file):
     print("Dataset: {file}")
     print(f"{len(projections)} groups")
     print("Done in %.6f ms" % (duration*1000))
-    print(f"Initial maximum distance is {max_disonance : .3f}")
+    # print(f"Initial maximum distance is {max_disonance : .3f}")
 
     # See distance between groups:
-    for i, g in enumerate(projections):
-        print(f"Group {i+1} has {len(g)} items and a max distance of {df.disonance(g) : .3f}")
-        assert df.disonance(g) - 0.05 <= max_disonance
+    # for i, g in enumerate(projections):
+    #     print(f"Group {i+1} has {len(g)} items and a max distance of {df.disonance(g) : .3f}")
+    #     assert df.disonance(g) - 0.05 <= max_disonance
+    
+    # Sort groups
+    df.sort_groups(projections, settings={"verbose" : True})
 
 def test_random_projections_weather():
     random_projection_dataset("weather.csv")

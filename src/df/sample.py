@@ -211,7 +211,7 @@ class Sample:
             if self.klass is not None:
                 text += "-" # TODO
             elif len(self.y) > 0:
-                data = [ self.sample_median(rows, c) for c in self.y ]
+                data = self.sample_goals(rows)
                 data = [ f"{d : .1f}" for d in data ]
                 text += ",".join(data)
             else:
@@ -219,14 +219,71 @@ class Sample:
             text += "]"
             print(text)
     
+    # Get the medians of all the goals
+    # On a particular sample
+    def sample_goals(self, rows):
+        if len(self.y) == 0:
+            return []
+        return [ self.sample_median(rows, c) for c in self.y ]
+
     # Get the median of a sub-sample
     # On a particular column
     def sample_median(self, rows, col):
         data = [ r[col.at] for r in rows ]
         return median(data)
     
+    # Given a set of leaf clusters/groups
+    # Sort them
+    def sort_groups(self, groups, *, settings = {}):
+        # First, create "median" representative rows for each cluster
+        repr = [ [0 for c in self.cols] for g in groups ]
+        # Set the correct median values for the column
+        for i, g in enumerate(groups):
+            for c in self.y:
+                repr[i][c.at] = self.sample_median(g, c)
+        
+        # Second, use _zitler function to get sort order
+        # Using argsort
+        fun = lambda r1, r2: self._zitler(r1, r2)
+        order = argsort(repr, key = cmp_to_key(fun), reverse = False)
+
+        # Third, we re-sort the cluster with sortarg
+        ordered_groups = sortarg(groups, order)
+
+        # Fourth, if verbose, we show the results
+        self._print_ordered_groups(ordered_groups, settings = settings)
+
+        return ordered_groups
+    
+    def _print_ordered_groups(self, groups, *, settings = {}):
+        if (settings.get("verbose") == True) and (len(groups) > 1):
+            names = [ y.name for y in self.y ]
+            space = [len(n) + 5 for n in names]
+            s = ""
+
+            # Header
+            for n, sp in zip(names, space):
+                s += f"{n : <{sp}}"
+            s += "\n"
+
+            # Each group
+            # Assume its sorted
+            for i, g in enumerate(groups):
+                median = self.sample_goals(g)
+                for m, sp in zip(median, space):
+                    s += f"{m : <{sp}.1f}"
+                if i == 0:
+                    s += " <== best"
+                if i == len(groups) - 1:
+                    s += " <== worst"
+                s += "\n"
+            
+            print(s)
+
+            
+
     # Multi-objective order function for rows
-    # Equivalent of askink r1 < r2
+    # Equivalent of asking r1 < r2
     def _zitler(self, r1, r2):
         goals = self.y
         s1, s2 = 0, 0
