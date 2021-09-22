@@ -90,7 +90,7 @@ class Num(Column):
         n1 = self.n
         n2 = other.n
         iota = cohen * (self.sd*n1 + other.sd*n2) / (n1 + n2)
-        ranges = merge(unsuper(X, sqrt(len(X)), iota))
+        ranges = merge(unsuper(X, iota, sqrt(len(X))))
         
         if len(ranges) > 1:
             for r in ranges:

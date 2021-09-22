@@ -3,8 +3,6 @@ from src.etc import var
 def unsuper(data, min_break, min_size):
     data.sort(key=lambda d: d[0])
 
-    min_break = (data[-1][0] - data[0][0]) / min_break
-
     groups = []
     group = []
     nums = []
@@ -69,3 +67,4 @@ def merge(groups):
         return merge(proposal)
     else:
         return groups
+        
