@@ -202,8 +202,8 @@ class Sample:
     
     def _divs(self, rows, level, min_leaf_size, *, settings = {}):
         if len(rows) < 2*min_leaf_size:
-            new = self.clone(rows, subsample=True)
-            new._print_leaf(level, settings=settings)
+            new = self.clone(rows, subsample=False)
+            self._print_leaf(rows, level, settings=settings)
             return [new]
         self._print_node(rows, level, settings=settings)
         left, right = self.div1(rows, settings = settings)
@@ -218,18 +218,17 @@ class Sample:
             text += f"n={len(rows)} c={self.disonance(rows) : .2f}"
             print(text)
     
-    # Print self as node of the random projection
-    # Can also be used to show self quickly
-    def _print_leaf(self, level, *, settings = {}):
+    # Print a subset as node of the random projection
+    def _print_leaf(self, rows, level, *, settings = {}):
         if settings.get("verbose") == True:
             text = "|.. " * level
-            text += f"n={self.n_rows} c={self.disonance() : .2f}"
+            text += f"n={len(rows)} c={self.disonance(rows) : .2f}"
             text += " " * 5
             text += "goals = ["
             if self.klass is not None:
                 text += "-" # TODO
             elif len(self.y) > 0:
-                data = self.sample_goals()
+                data = self.sample_goals(rows)
                 data = [ f"{d : .1f}" for d in data ]
                 text += ",".join(data)
             else:
@@ -238,14 +237,18 @@ class Sample:
             print(text)
     
     # Get the medians of all the goals
-    def sample_goals(self):
+    def sample_goals(self, rows = None):
+        if rows is None:
+            rows = self.rows
         if len(self.y) == 0:
             return []
-        return [ self.sample_median(c) for c in self.y ]
+        return [ self.sample_median(c, rows) for c in self.y ]
 
     # Get the median of a particular column
-    def sample_median(self, col):
-        data = [ r[col.at] for r in self.rows ]
+    def sample_median(self, col, rows = None):
+        if rows is None:
+            rows = self.rows
+        data = [ r[col.at] for r in rows ]
         return median(data)
     
     # Given a set of leaf clusters/groups
@@ -303,7 +306,9 @@ class Sample:
         groups = self.divs(settings = settings)
         groups = self.sort_groups(groups, settings = settings)
         best, worst = groups[0], groups[-1]
-        
+        for good, bad in zip(best.x, worst.x):
+            for res in good.discretize(bad):
+                print(res)
 
     # Multi-objective order function for rows
     # Equivalent of asking r1 < r2

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from math import inf, sqrt
 from random import random
+from src.etc import bag
 
 def is_na(x):
     return x == "?"
@@ -20,6 +21,9 @@ class Column(ABC):
     @abstractmethod
     def distance(self, x1, x2, settings = {}):
         pass
+
+    def discretize(self, other):
+        yield from []
 
 # Skip column class
 # Ignores data
@@ -103,6 +107,19 @@ class Sym(Column):
         if is_na(x1) or is_na(x2):
             return 1
         return 0 if x1.upper() == x2.upper() else 1
+    
+    def get(self, key):
+        x = self.count.get(key)
+        if x is None:
+            x = 0
+        return x
+
+    def discretize(self, other):
+        for val in set(self.count.keys() | other.count.keys()):
+            yield bag( at = self.at, name = self.name,
+                    lo = val, hi = val, best = self.get(val),
+                    rest = other.get(val) )
+
 
 # Sample column class
 # Stores a random subset of the added values
