@@ -38,6 +38,7 @@ class Sample:
         self.rows = []
         self.keep = True
         self.n_rows = 0
+        self.subsample = False
     
     @staticmethod
     def read_csv(path):
@@ -68,8 +69,9 @@ class Sample:
 
     def _add_data(self, row):
         if len(row) == len(self.cols):
-            for item, col in zip(row, self.cols):
-                col.add(item)
+            if not(self.subsample):
+                for item, col in zip(row, self.cols):
+                    col.add(item)
             if self.keep:
                 self.rows.append(row)
                 self.n_rows += 1
@@ -84,9 +86,24 @@ class Sample:
         for row in matrix:
             self.add(row)
     
-    def clone(self):
+    # Creates a Sample with the same row structure
+    # Can create subsamples: share clones of columns, but can not update them
+    def clone(self, data = None, *, subsample = False):
         new_sample = Sample()
-        new_sample.add(self.names)
+        if subsample:
+            # Copy exact column structure
+            # Make so clone does not add anything
+            new_sample.cols = self.cols
+            new_sample.x = self.x
+            new_sample.y = self.y
+            new_sample.klass = self.klass
+            new_sample.names = self.names
+            new_sample.keep = self.keep
+            new_sample.subsample = True
+        else:
+            new_sample.add(self.names)
+        if data is not None:
+            new_sample.read(data)
         return new_sample
     
     def sort(self, asc=True):
@@ -185,14 +202,14 @@ class Sample:
     
     def _divs(self, rows, level, min_leaf_size, *, settings = {}):
         if len(rows) < 2*min_leaf_size:
-            self._print_leaf(rows, level, settings=settings)
-            return [rows]
+            new = self.clone(rows, subsample=True)
+            new._print_leaf(level, settings=settings)
+            return [new]
         self._print_node(rows, level, settings=settings)
         left, right = self.div1(rows, settings = settings)
         left = self._divs(left, level + 1, min_leaf_size, settings=settings)
         right = self._divs(right, level + 1, min_leaf_size, settings=settings)
-        left.extend(right)
-        return left
+        return left + right
 
     # Show a non-leaf node of the random projection
     def _print_node(self, rows, level, *, settings = {}):
@@ -201,17 +218,18 @@ class Sample:
             text += f"n={len(rows)} c={self.disonance(rows) : .2f}"
             print(text)
     
-    # Show a leaf node of the random projection
-    def _print_leaf(self, rows, level, *, settings = {}):
+    # Print self as node of the random projection
+    # Can also be used to show self quickly
+    def _print_leaf(self, level, *, settings = {}):
         if settings.get("verbose") == True:
             text = "|.. " * level
-            text += f"n={len(rows)} c={self.disonance(rows) : .2f}"
+            text += f"n={self.n_rows} c={self.disonance() : .2f}"
             text += " " * 5
             text += "goals = ["
             if self.klass is not None:
                 text += "-" # TODO
             elif len(self.y) > 0:
-                data = self.sample_goals(rows)
+                data = self.sample_goals()
                 data = [ f"{d : .1f}" for d in data ]
                 text += ",".join(data)
             else:
@@ -220,16 +238,14 @@ class Sample:
             print(text)
     
     # Get the medians of all the goals
-    # On a particular sample
-    def sample_goals(self, rows):
+    def sample_goals(self):
         if len(self.y) == 0:
             return []
-        return [ self.sample_median(rows, c) for c in self.y ]
+        return [ self.sample_median(c) for c in self.y ]
 
-    # Get the median of a sub-sample
-    # On a particular column
-    def sample_median(self, rows, col):
-        data = [ r[col.at] for r in rows ]
+    # Get the median of a particular column
+    def sample_median(self, col):
+        data = [ r[col.at] for r in self.rows ]
         return median(data)
     
     # Given a set of leaf clusters/groups
@@ -240,7 +256,7 @@ class Sample:
         # Set the correct median values for the column
         for i, g in enumerate(groups):
             for c in self.y:
-                repr[i][c.at] = self.sample_median(g, c)
+                repr[i][c.at] = g.sample_median(c)
         
         # Second, use _zitler function to get sort order
         # Using argsort
@@ -269,7 +285,7 @@ class Sample:
             # Each group
             # Assume its sorted
             for i, g in enumerate(groups):
-                median = self.sample_goals(g)
+                median = g.sample_goals()
                 for m, sp in zip(median, space):
                     s += f"{m : <{sp}.1f}"
                 if i == 0:
@@ -280,7 +296,14 @@ class Sample:
             
             print(s)
 
-            
+    # Do random projections
+    # Sort groups from best to worst
+    # For each feature, determine better partitioning range
+    def discretize(self, *, settings = {}):
+        groups = self.divs(settings = settings)
+        groups = self.sort_groups(groups, settings = settings)
+        best, worst = groups[0], groups[-1]
+        
 
     # Multi-objective order function for rows
     # Equivalent of asking r1 < r2
