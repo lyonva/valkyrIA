@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from math import inf, sqrt
 from random import random
 from src.etc import bag
+from src.ml import unsuper, merge
 
 def is_na(x):
     return x == "?"
@@ -44,6 +45,7 @@ class Num(Column):
         self.mu = 0
         self.mu2 = 0
         self.sd = 0
+        self.val = []
     
     def add(self, x):
         self.n += 1
@@ -58,6 +60,8 @@ class Num(Column):
         self.mu2 += delta * (x - self.mu)
         if self.n > 1:
             self.sd = sqrt((self.mu2 / (self.n - 1)))
+        
+        self.val.append(x)
     
     def weight(self):
         if self.name[-1] == "+":
@@ -78,6 +82,21 @@ class Num(Column):
             y = 0 if x > 0.5 else 1
             return y - x
         return self.norm_score(x1) - self.norm_score(x2)
+    
+    def discretize(self, other):
+        cohen = 0.3
+        # Organize data
+        X = [(good, 1) for good in self.val] + [(bad, 0) for bad in other.val]
+        n1 = self.n
+        n2 = other.n
+        iota = cohen * (self.sd*n1 + other.sd*n2) / (n1 + n2)
+        ranges = merge(unsuper(X, sqrt(len(X)), iota))
+        
+        if len(ranges) > 1:
+            for r in ranges:
+                counts = [x[1] for x in r]
+                yield bag( at = self.at, name = self.name, lo = r[0][0],
+                    hi = r[-1][0], best = counts.count(1), rest = counts.count(0))
 
 # Symbol column class
 # Stores categorical values

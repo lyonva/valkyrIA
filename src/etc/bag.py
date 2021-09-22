@@ -6,4 +6,4 @@ class bag:
         self.__dict__.update(kwargs)
     
     def __repr__(self):
-        return "{"+ ', '.join([f"{k} : {v}" for k, v in self.__dict__.items() if  k[0] != "_"]) + "}"
+        return "{"+ ', '.join([f"{k}:{v}" for k, v in self.__dict__.items() if  k[0] != "_"]) + "}"

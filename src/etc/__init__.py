@@ -1,4 +1,5 @@
 from .util import atom
+from .util import var
 
 from .cxn import cxn
 
@@ -11,4 +12,5 @@ __all__ = [atom,
            cxn,
            argsort,
            sortarg,
-           bag]
+           bag,
+           var]

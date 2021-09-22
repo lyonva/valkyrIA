@@ -19,3 +19,8 @@ def atom(e):
             return float(e)
         except:
             return e
+
+def var(items):
+    n = len(items)
+    return items[ 9*(n // 10) ] - items[ 9*(n // 10) ] / 2.56
+
