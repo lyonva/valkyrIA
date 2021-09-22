@@ -309,6 +309,12 @@ class Sample:
         for good, bad in zip(best.x, worst.x):
             for res in good.discretize(bad):
                 print(res)
+        # Show some values from best and worst
+        print("Best")
+        print(best)
+        print()
+        print("Worst")
+        print(worst)
 
     # Multi-objective order function for rows
     # Equivalent of asking r1 < r2
