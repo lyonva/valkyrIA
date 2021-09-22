@@ -10,6 +10,7 @@ def discretize_dataset(file):
     path = os.path.join("data", file)
     df = Sample.read_csv(path)
 
+    print(f"Dataset: {file}")
     df.discretize(settings = {"verbose" : True})
 
 def test_discretize_weather():

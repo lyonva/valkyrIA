@@ -24,7 +24,7 @@ def random_projection_dataset(file):
     assert n == df.n_rows
     
     max_disonance = df.disonance()
-    print("Dataset: {file}")
+    print(f"Dataset: {file}")
     print(f"{len(projections)} groups")
     print("Done in %.6f ms" % (duration*1000))
     # print(f"Initial maximum distance is {max_disonance : .3f}")
