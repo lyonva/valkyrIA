@@ -305,16 +305,34 @@ class Sample:
     def discretize(self, *, settings = {}):
         groups = self.divs(settings = settings)
         groups = self.sort_groups(groups, settings = settings)
+
+        feature_ranges = []
+
         best, worst = groups[0], groups[-1]
         for good, bad in zip(best.x, worst.x):
+            range = []
             for res in good.discretize(bad):
-                print(res)
-        # Show some values from best and worst
-        print("Best")
-        print(best)
-        print()
-        print("Worst")
-        print(worst)
+                range += [res]
+            feature_ranges += [range]
+        
+        self._show_discretized_ranges(feature_ranges, best, worst, settings = settings)
+
+        return feature_ranges
+
+        
+    def _show_discretized_ranges(self, feature_ranges, best, worst, *, settings = {}):
+        if (settings.get("verbose") == True):
+            for range in feature_ranges:
+                for r in range:
+                    print(r)
+                print("")
+
+            # Show some values from best and worst
+            print("Best")
+            print(best)
+            print()
+            print("Worst")
+            print(worst)
 
     # Multi-objective order function for rows
     # Equivalent of asking r1 < r2
