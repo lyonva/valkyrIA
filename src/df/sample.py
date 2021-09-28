@@ -333,6 +333,47 @@ class Sample:
             print()
             print("Worst")
             print(worst)
+    
+    # Determine if a row is in or out a slice
+    # row is the row
+    # bin is a bag with range info
+    def match(self, row, bin):
+        v = row[ bin.at ]
+        if bin.first:
+            return v <= bin.hi
+        elif bin.last:
+            return bin.lo <= v
+        else:
+            return bin.lo <= v <= bin.hi
+    
+    # Cut the sample in half
+    # According to a range (bin)
+    def slice(self, bin):
+        # Sort whether each row is in or out the bin
+        in_bin = []
+        out_bin = []
+        for row in self.rows:
+            verdict = self.match(row, bin)
+            to_app = in_bin if verdict else out_bin
+            to_app += [row]
+        
+        # Make sub-clones
+        in_sample = self.clone(in_bin)
+        out_sample = self.clone(out_bin)
+
+        return in_sample, out_sample
+    
+    # Return slicing rule as str notation
+    # For debugging
+    def slice_str(self, bin):
+        if bin.lo == bin.hi:
+            return f"{bin.name} == {bin.lo}"
+        elif bin.first:
+            return f"{bin.name} <= {bin.hi}"
+        elif bin.last:
+            return f"{bin.lo} <= {bin.name}"
+        else:
+            return f"{bin.lo} <= {bin.name} <= {bin.hi}"
 
     # Multi-objective order function for rows
     # Equivalent of asking r1 < r2
