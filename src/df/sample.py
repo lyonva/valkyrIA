@@ -313,7 +313,8 @@ class Sample:
             range = []
             for res in good.discretize(bad):
                 range += [res]
-            feature_ranges += [range]
+            if len(range) > 0:
+                feature_ranges += [range]
         
         self._show_discretized_ranges(feature_ranges, best, worst, settings = settings)
 
@@ -338,13 +339,15 @@ class Sample:
     # row is the row
     # bin is a bag with range info
     def match(self, row, bin):
-        v = row[ bin.at ]
-        if bin.first:
-            return v <= bin.hi
-        elif bin.last:
-            return bin.lo <= v
+        lo = bin["lo"]
+        hi = bin["hi"]
+        v = row[ bin["at"] ]
+        if bin["first"]:
+            return v <= hi
+        elif bin["last"]:
+            return lo <= v
         else:
-            return bin.lo <= v <= bin.hi
+            return lo <= v <= hi
     
     # Cut the sample in half
     # According to a range (bin)
@@ -366,12 +369,15 @@ class Sample:
     # Return slicing rule as str notation
     # For debugging
     def slice_str(self, bin):
-        if bin.lo == bin.hi:
-            return f"{bin.name} == {bin.lo}"
-        elif bin.first:
-            return f"{bin.name} <= {bin.hi}"
-        elif bin.last:
-            return f"{bin.lo} <= {bin.name}"
+        lo = bin["lo"]
+        hi = bin["hi"]
+        name = bin["name"]
+        if lo == hi:
+            return f"{name} == {lo}"
+        elif bin["first"]:
+            return f"{name} <= {hi}"
+        elif bin["laste"]:
+            return f"{lo} <= {name}"
         else:
             return f"{bin.lo} <= {bin.name} <= {bin.hi}"
 

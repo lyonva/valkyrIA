@@ -11,7 +11,23 @@ def discretize_dataset(file):
     df = Sample.read_csv(path)
 
     print(f"Dataset: {file}")
-    df.discretize(settings = {"verbose" : True})
+    parts = df.discretize(settings = {"verbose" : True})
+    
+    for feature in parts:
+        for interval in feature:
+            in_sample, out_sample = df.slice(interval)
+            rule = df.slice_str(interval)
+
+            print("-"*50)
+            print(rule)
+            print()
+            print("In the rule:")
+            print(in_sample)
+            print()
+            print("Outside the rule:")
+            print(out_sample)
+            print("-"*50)
+
 
 def test_discretize_weather():
     discretize_dataset("weather.csv")
