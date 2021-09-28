@@ -93,10 +93,12 @@ class Num(Column):
         ranges = merge(unsuper(X, iota, sqrt(len(X))))
         
         if len(ranges) > 1:
-            for r in ranges:
+            for n, r in enumerate(ranges):
                 counts = [x[1] for x in r]
-                yield bag( at = self.at, name = self.name, lo = r[0][0],
-                    hi = r[-1][0], best = counts.count(1), rest = counts.count(0))
+                yield bag( at = self.at, name = self.name, lo = r[0][0], hi = r[-1][0],
+                        best = counts.count(1), bests = n1,
+                        rest = counts.count(0), rests = n2,
+                        first = (n == 0), last = (n == len(ranges)))
 
 # Symbol column class
 # Stores categorical values
@@ -135,9 +137,10 @@ class Sym(Column):
 
     def discretize(self, other):
         for val in set(self.count.keys() | other.count.keys()):
-            yield bag( at = self.at, name = self.name,
-                    lo = val, hi = val, best = self.get(val),
-                    rest = other.get(val) )
+            yield bag( at = self.at, name = self.name, lo = val, hi = val,
+                    best = self.get(val), bests = self.n,
+                    rest = other.get(val), rests = other.n,
+                    first = False, last = False )
 
 
 # Sample column class
