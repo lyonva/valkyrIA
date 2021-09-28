@@ -1,6 +1,62 @@
 from src.etc import argsort, sortarg
 from itertools import chain
 
+def bit_strings(level):
+    if level <= 1:
+        return ["0", "1"]
+    next = bit_strings(level - 1)
+    return [ x + "0" for x in next ] + [ x + "1" for x in next ]
+
+# Generates all possible trees in a depth
+class FFTForest():
+    default_parameters = {
+        "max_depth" : 4, # Maximum depth for the trees
+            # FFTF will generate 2**max_depth trees
+        "score_support" : 2, # Support parameter for scoring function
+            # Scoring determines which bin is the best for dividing data
+        "min_samples_split" : 10, # Minimum number of samples per split
+            # Leaves will be then at least min_samples_split / 2
+    }
+
+    # Get value of a particular hyper-parameter
+    def hp(self, name):
+        if name in self.hyper_parameters.keys(): 
+            return self.hyper_parameters[name]
+        else:
+            return self.default_parameters[name]
+    
+    # Get all hps
+    def hps(self):
+        return { name : self.hp(name) for name in self.default_parameters.keys() }
+    
+    # Overload get to fetch hyper-params
+    def __getitem__(self, name):
+        return self.hp(name)
+
+    def __init__(self, sample, **hyper_parameters):
+        self.sample = sample
+        self.hyper_parameters = hyper_parameters
+        self.fft = []
+        self.fit()
+
+    # Construct an FFT Forest
+    # i.e. all possible options
+    def fit(self):
+        for bits in bit_strings(self["max_depth"]):
+            args = self.hps()
+            args["structure"] = bits
+            self.fft += [FFT(self.sample, **args)]
+    
+    # Show all FFTrees
+    def __str__(self):
+        s = ""
+        for i, fft in enumerate(self.fft):
+            s += f"{i}\n{fft}\n"
+        return s
+
+
+        
+
 class FFT():
 
     default_parameters = {

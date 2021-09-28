@@ -242,6 +242,8 @@ class Sample:
             rows = self.rows
         if len(self.y) == 0:
             return []
+        if len(rows) == 0:
+            return []
         return [ self.sample_median(c, rows) for c in self.y ]
 
     # Get the median of a particular column
