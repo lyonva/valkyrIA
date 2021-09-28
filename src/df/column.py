@@ -71,6 +71,8 @@ class Num(Column):
         return 0
     
     def norm_score(self, x):
+        if self.lo == self.hi:
+            return 0.5
         return (x - self.lo) / (self.hi - self.lo)
     
     def distance(self, x1, x2, settings = {}):
