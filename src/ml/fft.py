@@ -1,5 +1,6 @@
 from src.etc import argsort, sortarg
 from itertools import chain
+from math import exp
 
 def bit_strings(level):
     if level <= 1:
@@ -179,6 +180,25 @@ class FFT():
         scores = [ self.score_bin(rule, bin) for bin in bins ]
         order = argsort( scores, reverse = True )
         return sortarg(bins, order)
+    
+    def best_leaf(self):
+        if type(self.root) == FFTLeaf:
+            return self.root
+        best = self.root.leaf
+        current = self.root.down
+        while type(current) == FFTBranch:
+            leaf = current.leaf
+            if leaf.sample.n_rows > 0 and best.zitler(leaf) == 1:
+                best = leaf
+            current = current.down
+        
+        # Check last leaf
+        leaf = current
+        if leaf.sample.n_rows > 0 and best.zitler(leaf) == 1:
+            best = leaf
+        
+        return best
+        
 
 
     # Return FFT as a string
@@ -208,6 +228,39 @@ class FFTLeaf():
 
     def __str__(self):
         return f"{self.sample.sample_goals()} ({self.sample.n_rows})"
+    
+    def zitler(self, other):
+        r1 = self.sample.sample_goals()
+        r2 = other.sample.sample_goals()
+        goals = self.sample.y
+        s1, s2 = 0, 0
+        n = len(goals)
+        for i, goal in enumerate(goals):
+            w = goal.weight() # Ask if min or max column
+
+            # Get normalized values for each row
+            x = goal.norm_score(r1[i])
+            y = goal.norm_score(r2[i])
+
+            # Scores
+            s1 -= exp( w * (x-y)/n )
+            s2 -= exp( w * (y-x)/n )
+        
+        # Now account for n
+        x = self.sample.n_rows
+        y = other.sample.n_rows
+        x = x / max(x, y)
+        y = y / max(x, y)
+        s1 -= exp( 1 * (x-y)/n )
+        s2 -= exp( 1 * (y-x)/n )
+        
+        # Return in format of python sort
+        if s1/n < s2/n:
+            return -1
+        elif s1/n > s2/n:
+            return 1
+        else:
+            return 0
 
 # Class that represents a branch or decision of an FFTree
 # bit is whether the branch is a 0 or 1 decision
