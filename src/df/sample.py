@@ -198,10 +198,13 @@ class Sample:
         return sorted[:mid], sorted[mid:]
     
     def divs(self, *, settings = {}):
-        return self._divs( self.rows, 1, ceil( self.n_rows**(1/2) ), settings=settings )
+        random_proj_exp = 0.5 if "random_proj_exp" not in settings.keys() else settings["random_proj_exp"]
+        min_leaf_size = int(self.n_rows**(random_proj_exp))
+        return self._divs( self.rows, 1, min_leaf_size, settings=settings )
     
     def _divs(self, rows, level, min_leaf_size, *, settings = {}):
-        if len(rows) < 2*min_leaf_size:
+        random_proj_depth = 5 if "random_proj_depth" not in settings.keys() else settings["random_proj_depth"]
+        if len(rows) < 2*min_leaf_size or level > random_proj_depth:
             new = self.clone(rows, subsample=False)
             self._print_leaf(rows, level, settings=settings)
             return [new]

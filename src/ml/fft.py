@@ -19,6 +19,8 @@ class FFTForest():
         "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
         "d" : 2, # Exponent for distance metrics
         "cohen" : 0.35, # For binning, ignore diferences less than cohen*sd
+        "random_proj_exp" : 0.5, # For random project, the min amount of samples is n**random_proj_exp
+        "random_proj_depth" : 5, # For random project, the max dendogram level
     }
 
     # Get value of a particular hyper-parameter
@@ -77,6 +79,8 @@ class FFT():
         "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
         "d" : 2, # Exponent for distance metrics
         "cohen" : 0.35, # For binning, ignore diferences less than cohen*sd
+        "random_proj_exp" : 0.5, # For random project, the min amount of samples is n**random_proj_exp
+        "random_proj_depth" : 5, # For random project, the max dendogram level
     }
 
     # Get value of a particular hyper-parameter
