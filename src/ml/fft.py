@@ -16,6 +16,7 @@ class FFTForest():
             # Scoring determines which bin is the best for dividing data
         "min_samples_split" : 10, # Minimum number of samples per split
             # Leaves will be then at least min_samples_split / 2
+        "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
     }
 
     # Get value of a particular hyper-parameter
@@ -71,6 +72,7 @@ class FFT():
             # Scoring determines which bin is the best for dividing data
         "min_samples_split" : 10, # Minimum number of samples per split
             # Leaves will be then at least min_samples_split / 2
+        "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
     }
 
     # Get value of a particular hyper-parameter
@@ -113,7 +115,7 @@ class FFT():
 
         # Build one level
         # First get partitions
-        partitions = sample.discretize()
+        partitions = sample.discretize(settings = self.hps())
         bins = list(chain.from_iterable(partitions)) # Flatten the output
 
         # Now choose the best bin

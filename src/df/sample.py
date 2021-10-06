@@ -313,7 +313,7 @@ class Sample:
         best, worst = groups[0], groups[-1]
         for good, bad in zip(best.x, worst.x):
             range = []
-            for res in good.discretize(bad):
+            for res in good.discretize(bad, settings = settings):
                 range += [res]
             if len(range) > 0:
                 feature_ranges += [range]

@@ -23,7 +23,7 @@ class Column(ABC):
     def distance(self, x1, x2, settings = {}):
         pass
 
-    def discretize(self, other):
+    def discretize(self, other, settings = {}):
         yield from []
 
 # Skip column class
@@ -85,14 +85,16 @@ class Num(Column):
             return y - x
         return self.norm_score(x1) - self.norm_score(x2)
     
-    def discretize(self, other):
+    def discretize(self, other, settings = {}):
+        min_bin_exp = 0.5 if "min_bin_exp" not in settings.keys() else settings["min_bin_exp"]
         cohen = 0.3
         # Organize data
         X = [(good, 1) for good in self.val] + [(bad, 0) for bad in other.val]
+        min_bin_size = int(len(X) ** min_bin_exp)
         n1 = self.n
         n2 = other.n
         iota = cohen * (self.sd*n1 + other.sd*n2) / (n1 + n2)
-        ranges = merge(unsuper(X, iota, sqrt(len(X))))
+        ranges = merge(unsuper(X, iota, min_bin_size))
         
         if len(ranges) > 1:
             for n, r in enumerate(ranges):
@@ -137,7 +139,7 @@ class Sym(Column):
             x = 0
         return x
 
-    def discretize(self, other):
+    def discretize(self, other, settings = {}):
         for val in set(self.count.keys() | other.count.keys()):
             yield bag( at = self.at, name = self.name, lo = val, hi = val,
                     best = self.get(val), bests = self.n,
