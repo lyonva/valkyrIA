@@ -7,6 +7,13 @@ def bit_strings(level):
     next = bit_strings(level - 1)
     return [ x + "0" for x in next ] + [ x + "1" for x in next ]
 
+def dec_2_bin(num):
+    s = ""
+    while num > 0:
+        num, res = num // 2, num % 2
+        s = str(res) + s
+    return s
+
 # Generates all possible trees in a depth
 class FFTForest():
     default_parameters = {
@@ -21,6 +28,7 @@ class FFTForest():
         "cohen" : 0.35, # For binning, ignore diferences less than cohen*sd
         "random_proj_exp" : 0.5, # For random project, the min amount of samples is n**random_proj_exp
         "random_proj_depth" : 5, # For random project, the max dendogram level
+        "target" : "1", # 1 for optimizing best, 0 for optimizing rest
     }
 
     # Get value of a particular hyper-parameter
@@ -82,6 +90,7 @@ class FFT():
         "cohen" : 0.35, # For binning, ignore diferences less than cohen*sd
         "random_proj_exp" : 0.5, # For random project, the min amount of samples is n**random_proj_exp
         "random_proj_depth" : 5, # For random project, the max dendogram level
+        "target" : "1", # 1 for optimizing best, 0 for optimizing rest
     }
 
     # Get value of a particular hyper-parameter
@@ -107,7 +116,10 @@ class FFT():
     
     # Construct an FFT
     def fit(self):
-        self.root = self._build_level(0, self.sample, sequence = self["structure"])
+        structure = self["structure"]
+        if type(structure) == int:
+            structure = dec_2_bin(self["structure"])
+        self.root = self._build_level(0, self.sample, sequence = structure)
 
     # Builds a level of the FFTree
     # Returns the resulting leaf

@@ -38,6 +38,8 @@ class RandomSearch:
         elif r_type == "float":
             a, b = hp_range[1], hp_range[2]
             return uniform(a, b)
+        elif r_type == "values":
+            return choice( hp_range[1:] )
         else:
             return None
 
