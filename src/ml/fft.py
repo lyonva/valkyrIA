@@ -17,6 +17,7 @@ class FFTForest():
         "min_samples_split" : 10, # Minimum number of samples per split
             # Leaves will be then at least min_samples_split / 2
         "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
+        "d" : 2, # Exponent for distance metrics
     }
 
     # Get value of a particular hyper-parameter
@@ -73,6 +74,7 @@ class FFT():
         "min_samples_split" : 10, # Minimum number of samples per split
             # Leaves will be then at least min_samples_split / 2
         "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
+        "d" : 2, # Exponent for distance metrics
     }
 
     # Get value of a particular hyper-parameter
