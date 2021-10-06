@@ -51,7 +51,6 @@ class FFTForest():
         self.sample = sample
         self.hyper_parameters = hyper_parameters
         self.fft = []
-        print(self.hps())
         self.fit()
 
     # Construct an FFT Forest
@@ -68,6 +67,19 @@ class FFTForest():
         for i, fft in enumerate(self.fft):
             s += f"{i}\n{fft}\n"
         return s
+    
+    def best_tree(self):
+        # The best FFTree is the one with the best leaf
+        best = None
+        for fft in self.fft:
+            if best is None:
+                best = fft
+            else:
+                best_leaf = best.best_leaf()
+                next_leaf = fft.best_leaf()
+                if best_leaf.zitler(next_leaf) == 1:
+                    best = fft
+        return fft
 
 
         
