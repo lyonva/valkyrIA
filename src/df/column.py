@@ -87,7 +87,7 @@ class Num(Column):
     
     def discretize(self, other, settings = {}):
         min_bin_exp = 0.5 if "min_bin_exp" not in settings.keys() else settings["min_bin_exp"]
-        cohen = 0.3
+        cohen = 0.35 if "cohen" not in settings.keys() else settings["cohen"]
         # Organize data
         X = [(good, 1) for good in self.val] + [(bad, 0) for bad in other.val]
         min_bin_size = int(len(X) ** min_bin_exp)

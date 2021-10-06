@@ -18,6 +18,7 @@ class FFTForest():
             # Leaves will be then at least min_samples_split / 2
         "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
         "d" : 2, # Exponent for distance metrics
+        "cohen" : 0.35, # For binning, ignore diferences less than cohen*sd
     }
 
     # Get value of a particular hyper-parameter
@@ -75,6 +76,7 @@ class FFT():
             # Leaves will be then at least min_samples_split / 2
         "min_bin_exp" : 0.5, # For generating bins, the min amount of samples is n**min_bin_exp
         "d" : 2, # Exponent for distance metrics
+        "cohen" : 0.35, # For binning, ignore diferences less than cohen*sd
     }
 
     # Get value of a particular hyper-parameter
