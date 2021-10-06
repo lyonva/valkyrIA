@@ -17,7 +17,7 @@ def random_projection_dataset(file):
 
     # Check minimum size of each group
     for group in projections:
-        assert group.n_rows >= (df.n_rows)**(1/2)
+        assert group.n_rows >= int((df.n_rows)**(1/2))
 
     # Check that subgroups are complete
     n = sum([g.n_rows for g in projections])
