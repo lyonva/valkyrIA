@@ -42,6 +42,7 @@ class FFTForest():
         self.sample = sample
         self.hyper_parameters = hyper_parameters
         self.fft = []
+        print(self.hps())
         self.fit()
 
     # Construct an FFT Forest
