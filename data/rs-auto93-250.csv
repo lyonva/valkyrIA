@@ -1,4 +1,4 @@
-structure,max_depth,score_support,min_samples_split,min_bin_exp,d,cohen,random_proj_exp,random_proj_depth,Weight-,Acceleration+,Mpg+,N+
+structure,Max_depth,Score_support,Min_samples_split,Min_bin_exp,D,Cohen,Random_proj_exp,Random_proj_depth,Weight-,Acceleration+,Mpg+,N+
 23,3,1,34,0.878167708964163,4,0.842079795984098,0.463469126444257,4,2155,16.4,30,79
 14,2,2,48,0.755084752582947,3,0.395546623049935,0.47306465601603,2,2234,16.1,30,203
 17,5,2,32,0.30524685582218,2,0.838145312439438,0.360100236837713,5,2155,16.4,30,79
